@@ -1,0 +1,32 @@
+﻿name: Release
+
+on:
+  push:
+    tags:
+      - 'Release_*'
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows executable
+        run: dotnet publish ./CalculatingMachine/CalculatingMachine.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: gh release create $env:TAG_NAME ./CalculatingMachine/bin/Release/net8.0/win-x64/publish/CalculatingMachine.exe --title $env:TAG_NAME --notes "Windows executable build for $env:TAG_NAME"
