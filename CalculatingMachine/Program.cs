@@ -23,202 +23,222 @@ class Program
         List<string> rearStr = new List<string>();
         Stack<Operator> operatorStack = new Stack<Operator>();
 
-        Console.WriteLine("입력 : ");
-
-        str = Console.ReadLine();
-
-        int len = str.Length;
-        char preChar = '\n';
-        string nums = string.Empty;
-
-        for (int i = 0; i < len; i++)
+        while(true)
         {
-            if (preChar != '\n')
+            Console.WriteLine("프로그램 종료 : Exit");
+            Console.WriteLine("입력 : ");
+
+            str = Console.ReadLine();
+
+            if (str == "Exit" || str == "")
             {
-                if (str[i] >= '0' && str[i] <= '9')
-                {
-                    nums += str[i];
-                }
-                else if(str[i] == '.')
-                {
-                    nums += '.';
-                }
-                else if (str[i] == '-' && (preChar == '\n' || preChar == '(' || preChar == '+' || preChar == '-' || preChar == '*' || preChar == '/'))
-                {
-                    nums += '-';
-                }
-                else if (str[i] == '*' || str[i] == '/' || str[i] == '+' || str[i] == '-')
-                {
-                    if (nums.Length > 0)
-                    {
-                        rearStr.Add(nums);
-                        nums = string.Empty;
-                    }
-                    OperatorComparison(str[i]);
-                }
-                else if (str[i] == '(')
-                {
-                    if (nums.Length > 0)
-                    {
-                        rearStr.Add(nums);
-                        nums = string.Empty;
-                    }
+                Console.WriteLine("프로그램 종료");
+                break;
+            }
 
-                    Operator open = new Operator();
-                    open.sign = "(";
-                    open.priority = -1;
+            int len = str.Length;
+            char preChar = '\n';
+            string nums = string.Empty;
 
-                    operatorStack.Push(open);
-                }
-                else if (str[i] == ')')
+            numStack.Clear();
+            rearStr.Clear();
+            operatorStack.Clear();
+
+            for (int i = 0; i < len; i++)
+            {
+                if (preChar != '\n')
                 {
-                    if (nums.Length > 0)
+                    if (str[i] >= '0' && str[i] <= '9')
                     {
-                        rearStr.Add(nums);
-                        nums = string.Empty;
+                        nums += str[i];
                     }
-                    while (operatorStack.Count > 0 && operatorStack.Peek().sign != "(")
+                    else if (str[i] == '.')
                     {
-                        rearStr.Add(operatorStack.Pop().sign);
+                        nums += '.';
                     }
-                    if (operatorStack.Count == 0)
+                    else if (str[i] == '-' && (preChar == '\n' || preChar == '(' || preChar == '+' || preChar == '-' || preChar == '*' || preChar == '/'))
                     {
-                        Console.WriteLine("괄호가 맞지 않습니다.");
+                        nums += '-';
+                    }
+                    else if (str[i] == '*' || str[i] == '/' || str[i] == '+' || str[i] == '-')
+                    {
+                        if (nums.Length > 0)
+                        {
+                            rearStr.Add(nums);
+                            nums = string.Empty;
+                        }
+                        OperatorComparison(str[i]);
+                    }
+                    else if (str[i] == '(')
+                    {
+                        if (nums.Length > 0)
+                        {
+                            rearStr.Add(nums);
+                            nums = string.Empty;
+                        }
+
+                        Operator open = new Operator();
+                        open.sign = "(";
+                        open.priority = -1;
+
+                        operatorStack.Push(open);
+                    }
+                    else if (str[i] == ')')
+                    {
+                        if (nums.Length > 0)
+                        {
+                            rearStr.Add(nums);
+                            nums = string.Empty;
+                        }
+                        while (operatorStack.Count > 0 && operatorStack.Peek().sign != "(")
+                        {
+                            rearStr.Add(operatorStack.Pop().sign);
+                        }
+                        if (operatorStack.Count == 0)
+                        {
+                            Console.WriteLine("괄호가 맞지 않습니다.");
+                            continue;
+                        }
+                        else
+                        {
+                            operatorStack.Pop();
+                        }
                     }
                     else
                     {
-                        operatorStack.Pop();
+                        Console.WriteLine("잘못 된 입력입니다.");
+                        continue;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("잘못 된 입력입니다.");
-                }
-            }
-            else
-            {
-                if (str[i] >= '0' && str[i] <= '9')
-                {
-                    nums += str[i];
-                }
-                else if (str[i] == '-')
-                {
-                    nums += '-';
-                }
-                else if (str[i] == '(')
-                {
-                    Operator open = new Operator();
-                    open.sign = "(";
-                    open.priority = -1;
+                    if (str[i] >= '0' && str[i] <= '9')
+                    {
+                        nums += str[i];
+                    }
+                    else if (str[i] == '-')
+                    {
+                        nums += '-';
+                    }
+                    else if (str[i] == '(')
+                    {
+                        Operator open = new Operator();
+                        open.sign = "(";
+                        open.priority = -1;
 
-                    operatorStack.Push(open);
+                        operatorStack.Push(open);
+                    }
+                    else
+                    {
+                        Console.WriteLine("잘못 된 입력입니다.");
+                        continue;
+                    }
+                }
+                preChar = str[i];
+            }
+
+            if (nums.Length > 0)
+            {
+                rearStr.Add(nums);
+            }
+
+            while (operatorStack.Count > 0)
+            {
+                string cur = operatorStack.Pop().sign;
+                rearStr.Add(cur);
+            }
+
+            for (int i = 0; i < rearStr.Count; i++)
+            {
+                Console.WriteLine(rearStr[i]);
+            }
+
+            for (int i = 0; i < rearStr.Count; i++)
+            {
+                string cur = rearStr[i];
+                if (double.TryParse(cur, out double num))
+                {
+                    numStack.Push(num);
                 }
                 else
                 {
-                    Console.WriteLine("잘못 된 입력입니다.");
+                    double num1 = 0;
+                    double num2 = 0;
+                    double sum = 0;
+
+                    if (numStack.Count > 0)
+                    {
+                        num1 = numStack.Pop();
+                    }
+                    if (numStack.Count > 0)
+                    {
+                        num2 = numStack.Pop();
+                    }
+
+                    switch (cur[0])
+                    {
+                        case '*':
+                            sum = num1 * num2;
+                            numStack.Push(sum);
+                            break;
+                        case '/':
+                            sum = num2 / num1;
+                            numStack.Push(sum);
+                            break;
+                        case '+':
+                            sum = num1 + num2;
+                            numStack.Push(sum);
+                            break;
+                        case '-':
+                            sum = num2 - num1;
+                            numStack.Push(sum);
+                            break;
+                    }
                 }
             }
-            preChar = str[i];
-        }
 
-        if (nums.Length > 0)
-        {
-            rearStr.Add(nums);
-        }
+            double rel = numStack.Pop();
 
-        while (operatorStack.Count > 0)
-        {
-            string cur = operatorStack.Pop().sign;
-            rearStr.Add(cur);
-        }
+            Console.Write("결과 : ");
+            Console.WriteLine(rel.ToString("0.#####"));
 
-        for (int i = 0; i < rearStr.Count; i++)
-        {
-            Console.WriteLine(rearStr[i]);
-        }
-
-        for (int i = 0; i < rearStr.Count; i++)
-        {
-            string cur = rearStr[i];
-            if (double.TryParse(cur, out double num))
+            void OperatorComparison(char op)
             {
-                numStack.Push(num);
+                Operator curOperator = new Operator();
+
+                curOperator.sign = op.ToString();
+                curOperator.priority = GetPriority(op);
+
+                while (operatorStack.Count > 0 &&
+                       operatorStack.Peek().sign != "(" &&
+                       operatorStack.Peek().priority >= curOperator.priority)
+                {
+                    Operator preOperator = operatorStack.Pop();
+
+                    rearStr.Add(preOperator.sign);
+                }
+
+                operatorStack.Push(curOperator);
             }
-            else
+
+            int GetPriority(char op)
             {
-                double num1 = 0;
-                double num2 = 0;
-                double sum = 0;
-
-                if (numStack.Count > 0)
-                {
-                    num1 = numStack.Pop();
-                }
-                if (numStack.Count > 0)
-                {
-                    num2 = numStack.Pop();
-                }
-
-                switch (cur[0])
+                switch (op)
                 {
                     case '*':
-                        sum = num1 * num2;
-                        numStack.Push(sum);
-                        break;
                     case '/':
-                        sum = num2 / num1;
-                        numStack.Push(sum);
-                        break;
+                        return 2;
+
                     case '+':
-                        sum = num1 + num2;
-                        numStack.Push(sum);
-                        break;
                     case '-':
-                        sum = num2 - num1;
-                        numStack.Push(sum);
-                        break;
+                        return 1;
                 }
+
+                return -1;
             }
         }
 
-        double rel = numStack.Pop();
-
-        Console.WriteLine(rel.ToString("0.#####"));
-
-        void OperatorComparison(char op)
-        {
-            Operator curOperator = new Operator();
-
-            curOperator.sign = op.ToString();
-            curOperator.priority = GetPriority(op);
-
-            while (operatorStack.Count > 0 &&
-                   operatorStack.Peek().sign != "(" &&
-                   operatorStack.Peek().priority >= curOperator.priority)
-            {
-                Operator preOperator = operatorStack.Pop();
-
-                rearStr.Add(preOperator.sign);
-            }
-
-            operatorStack.Push(curOperator);
-        }
-
-        int GetPriority(char op)
-        {
-            switch (op)
-            {
-                case '*':
-                case '/':
-                    return 2;
-
-                case '+':
-                case '-':
-                    return 1;
-            }
-
-            return -1;
-        }
+      
 
     }
 }
