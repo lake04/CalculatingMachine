@@ -39,6 +39,14 @@ class Program
                 {
                     nums += str[i];
                 }
+                else if(str[i] == '.')
+                {
+                    nums += '.';
+                }
+                else if (str[i] == '-' && (preChar == '\n' || preChar == '(' || preChar == '+' || preChar == '-' || preChar == '*' || preChar == '/'))
+                {
+                    nums += '-';
+                }
                 else if (str[i] == '*' || str[i] == '/' || str[i] == '+' || str[i] == '-')
                 {
                     if (nums.Length > 0)
@@ -69,7 +77,7 @@ class Program
                         rearStr.Add(nums);
                         nums = string.Empty;
                     }
-                    while(operatorStack.Count > 0 && operatorStack.Peek().sign != "(")
+                    while (operatorStack.Count > 0 && operatorStack.Peek().sign != "(")
                     {
                         rearStr.Add(operatorStack.Pop().sign);
                     }
@@ -93,10 +101,10 @@ class Program
                 {
                     nums += str[i];
                 }
-                //else if (str[i] == '-')
-                //{
-                   
-                //}
+                else if (str[i] == '-')
+                {
+                    nums += '-';
+                }
                 else if (str[i] == '(')
                 {
                     Operator open = new Operator();
@@ -132,9 +140,8 @@ class Program
         for (int i = 0; i < rearStr.Count; i++)
         {
             string cur = rearStr[i];
-            if (cur[0] >= '0' && cur[0] <= '9')
+            if (double.TryParse(cur, out double num))
             {
-                double num = double.Parse(cur);
                 numStack.Push(num);
             }
             else
@@ -174,7 +181,9 @@ class Program
             }
         }
 
-        Console.WriteLine(numStack.Pop());
+        double rel = numStack.Pop();
+
+        Console.WriteLine(rel.ToString("0.#####"));
 
         void OperatorComparison(char op)
         {
@@ -184,6 +193,7 @@ class Program
             curOperator.priority = GetPriority(op);
 
             while (operatorStack.Count > 0 &&
+                   operatorStack.Peek().sign != "(" &&
                    operatorStack.Peek().priority >= curOperator.priority)
             {
                 Operator preOperator = operatorStack.Pop();
